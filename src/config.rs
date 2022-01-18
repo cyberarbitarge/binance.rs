@@ -21,11 +21,14 @@ pub struct Config{
 impl Config {
 
     // sign the message to signature used in binance apis 
-    pub fn sign(&self, message: &[u8]) -> Result<Vec<u8>, error::OpensslError> {
+    pub fn sign(&self, message: &[u8]) -> Result<Vec<u8>, error::BinanceError> {
         let secret = PKey::hmac(&self.api_secret)?;
         let mut signer = Signer::new(MessageDigest::sha256(), &secret)?;
         signer.update(message)?;
-        signer.sign_to_vec()
+        match signer.sign_to_vec() {
+            Ok(v) => Ok(v),
+            Err(e) => Err(error::BinanceError::Openssl(e))
+        }
     }
 }
 
@@ -52,7 +55,10 @@ impl Builder {
     }
 
     //TODO: use Result 
-    pub fn build(self) -> Result<Config, error::ConfigurationError> {
+    pub fn build(self) -> Result<Config, error::BinanceError> {
+        if self.api_key.len() == 0 || self.api_secret.is_empty() {
+            return Err(error::BinanceError::Configuration{cause: "api key or secret if invalid ".to_string()});
+        }
         Ok(
             Config{
                 api_key: self.api_key,

@@ -1,3 +1,7 @@
 # binance.rs
 
-Binance API implementation by Rust. keeping optimized for high-frequency trading in Cryptos market. 
+Yet another Binance API and websocket listeners implementation by Rust. We used this in our arbitrage system for our HFT system trading in Binanace.
+
+# examples 
+
+TODO:
