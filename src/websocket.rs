@@ -2,6 +2,8 @@
 //!
 //! conver binance websocket protocol from Java
 
+const STREAM_LIMIT: u32 = 1024;
+
 pub enum Payload {
     AggTrade {
         e: String,

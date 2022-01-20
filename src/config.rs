@@ -10,12 +10,12 @@ use crate::error;
 
 #[derive(Serialize, Deserialize,Debug)]
 pub struct Config{
-    api_key: &'static str,
-    api_secret: Vec<u8>,
-    spot_api_url: &'static str,
-    spot_ws_url: &'static str,
-    spot_stream_url: &'static str,
-    spot_order_recv_window: u32,
+    pub api_key: &'static str,
+    pub api_secret: Vec<u8>,
+    pub spot_api_url: &'static str,
+    pub spot_ws_url: &'static str,
+    pub spot_stream_url: &'static str,
+    pub spot_order_recv_window: u32,
 }
 
 impl Config {
@@ -54,7 +54,6 @@ impl Builder {
         }
     }
 
-    //TODO: use Result 
     pub fn build(self) -> Result<Config, error::BinanceError> {
         if self.api_key.len() == 0 || self.api_secret.is_empty() {
             return Err(error::BinanceError::Configuration{cause: "api key or secret if invalid ".to_string()});
