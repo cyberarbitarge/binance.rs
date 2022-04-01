@@ -2,6 +2,7 @@ use anyhow::Result;
 use openssl::hash::MessageDigest;
 use openssl::pkey::PKey;
 use openssl::sign::Signer as OpensslSigner;
+
 /// provide the binance api key and secret
 pub trait SecretProvider<'a> {
     /// return current binance secret key
@@ -14,6 +15,7 @@ pub trait ParameterProvider<'a> {
     fn wait_to_sign(&'a self) -> &'a [u8];
 }
 
+/// sign a message witin the secret provider 
 pub struct Signer<S> {
     secret_provider: S,
 }
@@ -35,6 +37,18 @@ where
         let mut signer = OpensslSigner::new(MessageDigest::sha256(), &secret)?;
         signer.update(parameter.wait_to_sign())?;
         Ok(signer.sign_to_vec()?)
+    }
+}
+
+impl ParameterProvider<'_> for &str {
+    fn wait_to_sign(&self) -> &[u8] {
+        self.as_bytes()
+    }
+}
+
+impl ParameterProvider<'_> for String {
+    fn wait_to_sign(&self) -> &[u8] {
+        self.as_bytes()
     }
 }
 
@@ -79,5 +93,14 @@ mod tests {
         let result = signer.sign(&mock);
         assert!(result.is_ok());
         assert!(openssl::memcmp::eq(&target, &result.unwrap()));
+    }
+
+    #[test]
+    fn test_auto_impl() {
+        let r#str = "symbol=LTCBTC&side=BUY&type=LIMIT&timeInForce=GTC&quantity=1&price=0.1&recvWindow=5000&timestamp=1499827319559";
+        let string = String::from("symbol=LTCBTC&side=BUY&type=LIMIT&timeInForce=GTC&quantity=1&price=0.1&recvWindow=5000&timestamp=1499827319559");
+        let target = b"symbol=LTCBTC&side=BUY&type=LIMIT&timeInForce=GTC&quantity=1&price=0.1&recvWindow=5000&timestamp=1499827319559";
+        assert!(openssl::memcmp::eq(r#str.wait_to_sign(), target));
+        assert!(openssl::memcmp::eq(string.wait_to_sign(), target));
     }
 }
