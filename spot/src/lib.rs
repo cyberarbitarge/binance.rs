@@ -1,8 +1,10 @@
-//! Binance Spot Connector 
+//! Binance Spot Connector
 //!
 //! Supplies the primitives to connect to Binance and trade any token.
 
-
+mod error;
+mod filter;
+mod request;
 
 #[cfg(test)]
 mod tests {

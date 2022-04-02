@@ -3,28 +3,28 @@ use openssl::hash::MessageDigest;
 use openssl::pkey::PKey;
 use openssl::sign::Signer as OpensslSigner;
 
-/// provide the binance api key and secret
+/// provide the binance api secret
 pub trait SecretProvider<'a> {
     /// return current binance secret key
     fn secret(&'a self) -> &'a [u8];
 }
 
 /// parameters provider
+/// FIXME: should change the parameter to AsRef<[u8]> then could use the Vec<u8> to generate the 
+/// parameter 
 pub trait ParameterProvider<'a> {
     /// return the parameters wait to sign
     fn wait_to_sign(&'a self) -> &'a [u8];
 }
 
-/// sign a message witin the secret provider 
+/// sign a message witin the secret provider
 pub struct Signer<S> {
     secret_provider: S,
 }
 
 impl<S> Signer<S> {
     pub fn new(s: S) -> Self {
-        Signer {
-            secret_provider: s,
-        }
+        Signer { secret_provider: s }
     }
 }
 
